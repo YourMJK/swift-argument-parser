@@ -11,7 +11,7 @@
 
 internal struct HelpGenerator {
   static var helpIndent = 2
-  static var labelColumnWidth = 26
+  static var labelColumnWidth = 40
   static var systemScreenWidth: Int { _terminalSize().width }
 
   struct Section {
