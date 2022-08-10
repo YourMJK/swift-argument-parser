@@ -67,6 +67,7 @@ extension UsageGenerator {
 }
 
 extension ArgumentDefinition {
+  /// Full synopsis used in ARGUMENTS and OPTIONS sections
   var synopsisForHelp: String {
     switch kind {
     case .named:
@@ -77,6 +78,9 @@ extension ArgumentDefinition {
 
       switch update {
       case .unary:
+        if !help.allValues.isEmpty {
+          return "\(joinedSynopsisString) (\(help.allValues.joined(separator: " | ")))"
+        }
         return "\(joinedSynopsisString) <\(valueName)>"
       case .nullary:
         return joinedSynopsisString
@@ -88,6 +92,7 @@ extension ArgumentDefinition {
     }
   }
 
+  /// Short synopsis used in USAGE section
   var unadornedSynopsis: String {
     switch kind {
     case .named:
