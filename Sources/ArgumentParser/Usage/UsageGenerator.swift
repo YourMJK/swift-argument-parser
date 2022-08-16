@@ -54,9 +54,9 @@ extension UsageGenerator {
         let synopsis = options
           .map { $0.synopsis }
           .joined(separator: " ")
-        return "\(toolName) [<options>] \(synopsis)"
+        return "\(toolName) [OPTIONS ...] \(synopsis)"
       }
-      return "\(toolName) <options>"
+      return "\(toolName) OPTIONS ..."
     default:
       let synopsis = options
         .map { $0.synopsis }
