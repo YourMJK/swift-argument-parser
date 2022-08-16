@@ -61,6 +61,10 @@ public struct CommandConfiguration {
   /// The width (in characters) of the left argument label column in the help message
   public var helpMessageLabelColumnWidth: Int = 40
   
+  /// A Boolean value indicating whether the options in the usage string
+  /// should always be shown in a compact form
+  public var alwaysCompactUsageOptions: Bool
+  
   /// Creates the configuration for a command.
   ///
   /// - Parameters:
@@ -97,7 +101,8 @@ public struct CommandConfiguration {
     defaultSubcommand: ParsableCommand.Type? = nil,
     helpNames: NameSpecification? = nil,
     helpMessageIndent: Int? = nil,
-    helpMessageLabelColumnWidth: Int? = nil
+    helpMessageLabelColumnWidth: Int? = nil,
+    alwaysCompactUsageOptions: Bool = false
   ) {
     self.commandName = commandName
     self.abstract = abstract
@@ -110,6 +115,7 @@ public struct CommandConfiguration {
     self.helpNames = helpNames
     if let helpMessageIndent = helpMessageIndent { self.helpMessageIndent = helpMessageIndent }
     if let helpMessageLabelColumnWidth = helpMessageLabelColumnWidth { self.helpMessageLabelColumnWidth = helpMessageLabelColumnWidth }
+    self.alwaysCompactUsageOptions = alwaysCompactUsageOptions
   }
 
   /// Creates the configuration for a command with a "super-command".
@@ -126,7 +132,8 @@ public struct CommandConfiguration {
     defaultSubcommand: ParsableCommand.Type? = nil,
     helpNames: NameSpecification? = nil,
     helpMessageIndent: Int? = nil,
-    helpMessageLabelColumnWidth: Int? = nil
+    helpMessageLabelColumnWidth: Int? = nil,
+    alwaysCompactUsageOptions: Bool = false
   ) {
     self.commandName = commandName
     self._superCommandName = _superCommandName
@@ -140,6 +147,7 @@ public struct CommandConfiguration {
     self.helpNames = helpNames
     if let helpMessageIndent = helpMessageIndent { self.helpMessageIndent = helpMessageIndent }
     if let helpMessageLabelColumnWidth = helpMessageLabelColumnWidth { self.helpMessageLabelColumnWidth = helpMessageLabelColumnWidth }
+    self.alwaysCompactUsageOptions = alwaysCompactUsageOptions
   }
 }
 
@@ -155,7 +163,8 @@ extension CommandConfiguration {
     defaultSubcommand: ParsableCommand.Type?,
     helpNames: NameSpecification?,
     helpMessageIndent: Int?,
-    helpMessageLabelColumnWidth: Int?
+    helpMessageLabelColumnWidth: Int?,
+    alwaysCompactUsageOptions: Bool = false
   ) {
     self.init(
       commandName: commandName,
@@ -168,6 +177,7 @@ extension CommandConfiguration {
       defaultSubcommand: defaultSubcommand,
       helpNames: helpNames,
       helpMessageIndent: helpMessageIndent,
-      helpMessageLabelColumnWidth: helpMessageLabelColumnWidth)
+      helpMessageLabelColumnWidth: helpMessageLabelColumnWidth,
+      alwaysCompactUsageOptions: alwaysCompactUsageOptions)
   }
 }

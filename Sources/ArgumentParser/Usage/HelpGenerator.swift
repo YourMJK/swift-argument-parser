@@ -108,7 +108,7 @@ internal struct HelpGenerator {
     if let usage = currentCommand.configuration.usage {
       self.usage = usage
     } else {
-      var usage = UsageGenerator(toolName: toolName, definition: [currentArgSet])
+      var usage = UsageGenerator(toolName: toolName, definition: [currentArgSet], compactUsageOptions: currentCommand.configuration.alwaysCompactUsageOptions)
         .synopsis
       if !currentCommand.configuration.subcommands.isEmpty {
         if usage.last != " " { usage += " " }

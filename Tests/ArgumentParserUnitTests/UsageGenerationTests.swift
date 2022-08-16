@@ -18,11 +18,12 @@ final class UsageGenerationTests: XCTestCase {
 func _testSynopsis<T: ParsableArguments>(
   _ type: T.Type,
   visibility: ArgumentVisibility = .default,
+  compactUsageOptions: Bool = false,
   expected: String,
   file: StaticString = #file,
   line: UInt = #line
 ) {
-  let help = UsageGenerator(toolName: "example", parsable: T(), visibility: visibility)
+  let help = UsageGenerator(toolName: "example", parsable: T(), visibility: visibility, compactUsageOptions: compactUsageOptions)
   XCTAssertEqual(help.synopsis, expected, file: file, line: line)
 }
 

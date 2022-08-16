@@ -14,22 +14,24 @@
 struct UsageGenerator {
   var toolName: String
   var definition: ArgumentSet
+  var compactUsageOptions: Bool
 }
 
 extension UsageGenerator {
-  init(definition: ArgumentSet) {
+  init(definition: ArgumentSet, compactUsageOptions: Bool) {
     let toolName = CommandLine.arguments[0].split(separator: "/").last.map(String.init) ?? "<command>"
-    self.init(toolName: toolName, definition: definition)
+    self.init(toolName: toolName, definition: definition, compactUsageOptions: compactUsageOptions)
   }
   
-  init(toolName: String, parsable: ParsableArguments, visibility: ArgumentVisibility) {
+  init(toolName: String, parsable: ParsableArguments, visibility: ArgumentVisibility, compactUsageOptions: Bool) {
     self.init(
       toolName: toolName,
-      definition: ArgumentSet(type(of: parsable), visibility: visibility))
+      definition: ArgumentSet(type(of: parsable), visibility: visibility),
+      compactUsageOptions: compactUsageOptions)
   }
   
-  init(toolName: String, definition: [ArgumentSet]) {
-    self.init(toolName: toolName, definition: ArgumentSet(sets: definition))
+  init(toolName: String, definition: [ArgumentSet], compactUsageOptions: Bool) {
+    self.init(toolName: toolName, definition: ArgumentSet(sets: definition), compactUsageOptions: compactUsageOptions)
   }
 }
 
@@ -39,10 +41,10 @@ extension UsageGenerator {
   /// In `roff`.
   var synopsis: String {
     var options = Array(definition)
-    switch options.count {
-    case 0:
+    if options.count == 0 {
       return toolName
-    case let x where x > 12:
+    }
+    else if options.count > 12 || compactUsageOptions {
       // When we have too many options, keep required and positional arguments,
       // but discard the rest.
       options = options.filter {
@@ -57,7 +59,8 @@ extension UsageGenerator {
         return "\(toolName) [OPTIONS ...] \(synopsis)"
       }
       return "\(toolName) OPTIONS ..."
-    default:
+    }
+    else {
       let synopsis = options
         .map { $0.synopsis }
         .joined(separator: " ")
