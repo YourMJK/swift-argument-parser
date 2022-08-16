@@ -55,6 +55,12 @@ public struct CommandConfiguration {
   /// Flag names to be used for help.
   public var helpNames: NameSpecification?
   
+  /// Number of spaces to use as indentation in the help message
+  public var helpMessageIndent: Int = 2
+  
+  /// The width (in characters) of the left argument label column in the help message
+  public var helpMessageLabelColumnWidth: Int = 40
+  
   /// Creates the configuration for a command.
   ///
   /// - Parameters:
@@ -89,7 +95,9 @@ public struct CommandConfiguration {
     shouldDisplay: Bool = true,
     subcommands: [ParsableCommand.Type] = [],
     defaultSubcommand: ParsableCommand.Type? = nil,
-    helpNames: NameSpecification? = nil
+    helpNames: NameSpecification? = nil,
+    helpMessageIndent: Int? = nil,
+    helpMessageLabelColumnWidth: Int? = nil
   ) {
     self.commandName = commandName
     self.abstract = abstract
@@ -100,6 +108,8 @@ public struct CommandConfiguration {
     self.subcommands = subcommands
     self.defaultSubcommand = defaultSubcommand
     self.helpNames = helpNames
+    if let helpMessageIndent = helpMessageIndent { self.helpMessageIndent = helpMessageIndent }
+    if let helpMessageLabelColumnWidth = helpMessageLabelColumnWidth { self.helpMessageLabelColumnWidth = helpMessageLabelColumnWidth }
   }
 
   /// Creates the configuration for a command with a "super-command".
@@ -114,7 +124,9 @@ public struct CommandConfiguration {
     shouldDisplay: Bool = true,
     subcommands: [ParsableCommand.Type] = [],
     defaultSubcommand: ParsableCommand.Type? = nil,
-    helpNames: NameSpecification? = nil
+    helpNames: NameSpecification? = nil,
+    helpMessageIndent: Int? = nil,
+    helpMessageLabelColumnWidth: Int? = nil
   ) {
     self.commandName = commandName
     self._superCommandName = _superCommandName
@@ -126,6 +138,8 @@ public struct CommandConfiguration {
     self.subcommands = subcommands
     self.defaultSubcommand = defaultSubcommand
     self.helpNames = helpNames
+    if let helpMessageIndent = helpMessageIndent { self.helpMessageIndent = helpMessageIndent }
+    if let helpMessageLabelColumnWidth = helpMessageLabelColumnWidth { self.helpMessageLabelColumnWidth = helpMessageLabelColumnWidth }
   }
 }
 
@@ -139,7 +153,9 @@ extension CommandConfiguration {
     shouldDisplay: Bool,
     subcommands: [ParsableCommand.Type],
     defaultSubcommand: ParsableCommand.Type?,
-    helpNames: NameSpecification?
+    helpNames: NameSpecification?,
+    helpMessageIndent: Int?,
+    helpMessageLabelColumnWidth: Int?
   ) {
     self.init(
       commandName: commandName,
@@ -150,6 +166,8 @@ extension CommandConfiguration {
       shouldDisplay: shouldDisplay,
       subcommands: subcommands,
       defaultSubcommand: defaultSubcommand,
-      helpNames: helpNames)
+      helpNames: helpNames,
+      helpMessageIndent: helpMessageIndent,
+      helpMessageLabelColumnWidth: helpMessageLabelColumnWidth)
   }
 }

@@ -10,8 +10,6 @@
 //===----------------------------------------------------------------------===//
 
 internal struct HelpGenerator {
-  static var helpIndent = 2
-  static var labelColumnWidth = 40
   static var systemScreenWidth: Int { _terminalSize().width }
 
   struct Section {
@@ -19,21 +17,23 @@ internal struct HelpGenerator {
       var label: String
       var abstract: String = ""
       var discussion: String = ""
+      var helpIndent: Int
+      var labelColumnWidth: Int
       
       var paddedLabel: String {
-        String(repeating: " ", count: HelpGenerator.helpIndent) + label
+        String(repeating: " ", count: helpIndent) + label
       }
       
       func rendered(screenWidth: Int) -> String {
         let paddedLabel = self.paddedLabel
         let wrappedAbstract = self.abstract
-          .wrapped(to: screenWidth, wrappingIndent: HelpGenerator.labelColumnWidth)
+          .wrapped(to: screenWidth, wrappingIndent: labelColumnWidth)
         let wrappedDiscussion = self.discussion.isEmpty
           ? ""
-          : self.discussion.wrapped(to: screenWidth, wrappingIndent: HelpGenerator.helpIndent * 4) + "\n"
+          : self.discussion.wrapped(to: screenWidth, wrappingIndent: helpIndent * 4) + "\n"
         let renderedAbstract: String = {
           guard !abstract.isEmpty else { return "" }
-          if paddedLabel.count < HelpGenerator.labelColumnWidth {
+          if paddedLabel.count < labelColumnWidth {
             // Render after padded label.
             return String(wrappedAbstract.dropFirst(paddedLabel.count))
           } else {
@@ -88,6 +88,8 @@ internal struct HelpGenerator {
   var usage: String
   var sections: [Section]
   var discussionSections: [DiscussionSection]
+  var helpIndent: Int
+  var labelColumnWidth: Int
   
   init(commandStack: [ParsableCommand.Type], visibility: ArgumentVisibility) {
     guard let currentCommand = commandStack.last else {
@@ -123,7 +125,9 @@ internal struct HelpGenerator {
       self.abstract += "\n\(currentCommand.configuration.discussion)"
     }
 
-    self.sections = HelpGenerator.generateSections(commandStack: commandStack, visibility: visibility)
+    self.helpIndent = currentCommand.configuration.helpMessageIndent
+    self.labelColumnWidth = currentCommand.configuration.helpMessageLabelColumnWidth
+    self.sections = HelpGenerator.generateSections(commandStack: commandStack, visibility: visibility, helpIndent: helpIndent, labelColumnWidth: labelColumnWidth)
     self.discussionSections = []
   }
   
@@ -131,7 +135,7 @@ internal struct HelpGenerator {
     self.init(commandStack: [type.asCommand], visibility: visibility)
   }
 
-  private static func generateSections(commandStack: [ParsableCommand.Type], visibility: ArgumentVisibility) -> [Section] {
+  private static func generateSections(commandStack: [ParsableCommand.Type], visibility: ArgumentVisibility, helpIndent: Int, labelColumnWidth: Int) -> [Section] {
     guard !commandStack.isEmpty else { return [] }
     
     var positionalElements: [Section.Element] = []
@@ -182,7 +186,7 @@ internal struct HelpGenerator {
           .joined(separator: " ")
       }
       
-      let element = Section.Element(label: synopsis, abstract: description, discussion: arg.help.discussion)
+      let element = Section.Element(label: synopsis, abstract: description, discussion: arg.help.discussion, helpIndent: helpIndent, labelColumnWidth: labelColumnWidth)
       if case .positional = arg.kind {
         positionalElements.append(element)
       } else {
@@ -200,7 +204,8 @@ internal struct HelpGenerator {
         }
         return Section.Element(
           label: label,
-          abstract: command.configuration.abstract)
+          abstract: command.configuration.abstract,
+          helpIndent: helpIndent, labelColumnWidth: labelColumnWidth)
     }
     
     return [
