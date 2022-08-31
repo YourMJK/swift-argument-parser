@@ -17,6 +17,7 @@ internal struct HelpGenerator {
       var label: String
       var abstract: String = ""
       var discussion: String = ""
+      var helpSectionName: String = ""
       var helpIndent: Int
       var labelColumnWidth: Int
       
@@ -67,13 +68,15 @@ internal struct HelpGenerator {
     var header: Header
     var elements: [Element]
     var discussion: String = ""
+    var name: String = ""
     var isSubcommands: Bool = false
     
     func rendered(screenWidth: Int) -> String {
       guard !elements.isEmpty else { return "" }
       
       let renderedElements = elements.map { $0.rendered(screenWidth: screenWidth) }.joined()
-      return "\(String(describing: header).uppercased()):\n"
+      let sectionName = name.isEmpty ? String(describing: header) : name
+      return "\(sectionName.uppercased()):\n"
         + renderedElements
     }
   }
@@ -186,7 +189,14 @@ internal struct HelpGenerator {
           .joined(separator: " ")
       }
       
-      let element = Section.Element(label: synopsis, abstract: description, discussion: arg.help.discussion, helpIndent: helpIndent, labelColumnWidth: labelColumnWidth)
+      let element = Section.Element(
+        label: synopsis,
+        abstract: description,
+        discussion: arg.help.discussion,
+        helpSectionName: arg.helpSectionName,
+        helpIndent: helpIndent,
+        labelColumnWidth: labelColumnWidth
+      )
       if case .positional = arg.kind {
         positionalElements.append(element)
       } else {
@@ -208,11 +218,26 @@ internal struct HelpGenerator {
           helpIndent: helpIndent, labelColumnWidth: labelColumnWidth)
     }
     
-    return [
-      Section(header: .positionalArguments, elements: positionalElements),
-      Section(header: .options, elements: optionElements),
-      Section(header: .subcommands, elements: subcommandElements),
-    ]
+    var sections: [Section] = []
+    func addSections(header: Section.Header, elements: [Section.Element], defaultNameForMultiple: String = "") {
+      var sectionDictionary: [String: [Section.Element]] = [:]
+      var sectionNames: [String] = []
+      for element in elements {
+        let sectionName = element.helpSectionName
+        if sectionDictionary[sectionName] == nil { sectionNames.append(sectionName) }
+        sectionDictionary[sectionName, default: []].append(element)
+      }
+      let defaultName = sectionNames.count > 1 ? defaultNameForMultiple : ""
+      for sectionName in sectionNames {
+        let name = sectionName.isEmpty ? defaultName : sectionName
+        sections.append(Section(header: header, elements: sectionDictionary[sectionName]!, name: name))
+      }
+    }
+    addSections(header: .positionalArguments, elements: positionalElements)
+    addSections(header: .options, elements: optionElements, defaultNameForMultiple: "General Options")
+    addSections(header: .subcommands, elements: subcommandElements)
+    
+    return sections
   }
   
   func usageMessage() -> String {

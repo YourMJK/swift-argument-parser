@@ -105,6 +105,7 @@ struct ArgumentDefinition {
   var parsingStrategy: ParsingStrategy
   var update: Update
   var initial: Initial
+  var helpSectionName: String = ""
   
   var names: [Name] {
     switch kind {
