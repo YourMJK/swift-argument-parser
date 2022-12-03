@@ -60,7 +60,7 @@ internal struct HelpGenerator {
         case .subcommands:
           return "Subcommands"
         case .options:
-          return "Options"
+          return "General Options"
         case .title(let name):
           return name
         }
