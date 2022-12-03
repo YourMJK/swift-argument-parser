@@ -51,6 +51,7 @@ internal struct HelpGenerator {
       case positionalArguments
       case subcommands
       case options
+      case examples
       case title(String)
       
       var description: String {
@@ -61,6 +62,8 @@ internal struct HelpGenerator {
           return "Subcommands"
         case .options:
           return "General Options"
+        case .examples:
+          return "Examples"
         case .title(let name):
           return name
         }
@@ -78,6 +81,7 @@ internal struct HelpGenerator {
       let renderedElements = elements.map { $0.rendered(screenWidth: screenWidth) }.joined()
       return "\(String(describing: header).uppercased()):\n"
         + renderedElements
+        + (!discussion.isEmpty ? "\n\(discussion)\n" : "")
     }
   }
   
@@ -91,8 +95,6 @@ internal struct HelpGenerator {
   var usage: String
   var sections: [Section]
   var discussionSections: [DiscussionSection]
-  var helpIndent: Int
-  var labelColumnWidth: Int
   
   init(commandStack: [ParsableCommand.Type], visibility: ArgumentVisibility) {
     guard let currentCommand = commandStack.last else {
@@ -128,9 +130,7 @@ internal struct HelpGenerator {
       self.abstract += "\n\(currentCommand.configuration.discussion)"
     }
 
-    self.helpIndent = currentCommand.configuration.helpMessageIndent
-    self.labelColumnWidth = currentCommand.configuration.helpMessageLabelColumnWidth
-    self.sections = HelpGenerator.generateSections(commandStack: commandStack, visibility: visibility, helpIndent: helpIndent, labelColumnWidth: labelColumnWidth)
+    self.sections = HelpGenerator.generateSections(commandStack: commandStack, visibility: visibility, configuration: currentCommand.configuration, toolName: toolName)
     self.discussionSections = []
   }
   
@@ -138,8 +138,12 @@ internal struct HelpGenerator {
     self.init(commandStack: [type.asCommand], visibility: visibility)
   }
 
-  private static func generateSections(commandStack: [ParsableCommand.Type], visibility: ArgumentVisibility, helpIndent: Int, labelColumnWidth: Int) -> [Section] {
+  private static func generateSections(commandStack: [ParsableCommand.Type], visibility: ArgumentVisibility, configuration: CommandConfiguration, toolName: String) -> [Section] {
     guard !commandStack.isEmpty else { return [] }
+    
+    let helpIndent = configuration.helpMessageIndent
+    let labelColumnWidth = configuration.helpMessageLabelColumnWidth
+    let examples = configuration.examples
     
     var positionalElements: [Section.Element] = []
     var optionElements: [Section.Element] = []
@@ -221,18 +225,37 @@ internal struct HelpGenerator {
           helpIndent: helpIndent, labelColumnWidth: labelColumnWidth)
     }
     
+    var names = commandStack.map { $0._commandName }
+    if let superName = commandStack.first!.configuration._superCommandName {
+      names.insert(superName, at: 0)
+    }
+    names.insert("help", at: 1)
+    let helpSubcommandMessage = String(repeating: " ", count: helpIndent)
+      + "See '\(names.joined(separator: " ")) <subcommand>' for detailed help."
+    
+    var exampleElements: [Section.Element] = []
+    for example in examples {
+      let element = Section.Element(
+        label: "\(toolName) \(example.arguments)",
+        abstract: example.description,
+        helpIndent: helpIndent, labelColumnWidth: labelColumnWidth)
+      exampleElements.append(element)
+    }
+    
     // Combine the compiled groups in this order:
     // - arguments
     // - named sections
     // - options/flags
     // - subcommands
+    // - examples
     return [
       Section(header: .positionalArguments, elements: positionalElements),
     ] + sectionTitles.map { name in
       Section(header: .title(name), elements: titledSections[name, default: []])
     } + [
       Section(header: .options, elements: optionElements),
-      Section(header: .subcommands, elements: subcommandElements),
+      Section(header: .subcommands, elements: subcommandElements, discussion: helpSubcommandMessage),
+      Section(header: .examples, elements: exampleElements),
     ]
   }
   
@@ -257,20 +280,6 @@ internal struct HelpGenerator {
       ? ""
       : "OVERVIEW: \(abstract)".wrapped(to: screenWidth) + "\n\n"
     
-    var helpSubcommandMessage = ""
-    if includesSubcommands {
-      var names = commandStack.map { $0._commandName }
-      if let superName = commandStack.first!.configuration._superCommandName {
-        names.insert(superName, at: 0)
-      }
-      names.insert("help", at: 1)
-
-      helpSubcommandMessage = """
-
-          See '\(names.joined(separator: " ")) <subcommand>' for detailed help.
-        """
-    }
-    
     let renderedUsage = usage.isEmpty
       ? ""
       : "USAGE: \(usage.hangingIndentingEachLine(by: 7))\n\n"
@@ -278,7 +287,7 @@ internal struct HelpGenerator {
     return """
     \(renderedAbstract)\
     \(renderedUsage)\
-    \(renderedSections)\(helpSubcommandMessage)
+    \(renderedSections)
     """
   }
 }

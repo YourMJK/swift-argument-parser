@@ -65,6 +65,16 @@ public struct CommandConfiguration {
   /// should always be shown in a compact form
   public var alwaysCompactUsageOptions: Bool
   
+  public struct Example {
+    var arguments: String
+    var description: String
+    public static func example(arguments: String, description: String = "") -> Self {
+      return Self(arguments: arguments, description: description)
+    }
+  }
+  /// An array of examples to show in the examples section of the help message
+  public var examples: [Example]
+  
   /// Creates the configuration for a command.
   ///
   /// - Parameters:
@@ -102,7 +112,8 @@ public struct CommandConfiguration {
     helpNames: NameSpecification? = nil,
     helpMessageIndent: Int? = nil,
     helpMessageLabelColumnWidth: Int? = nil,
-    alwaysCompactUsageOptions: Bool = false
+    alwaysCompactUsageOptions: Bool = false,
+    examples: [Example] = []
   ) {
     self.commandName = commandName
     self.abstract = abstract
@@ -116,6 +127,7 @@ public struct CommandConfiguration {
     if let helpMessageIndent = helpMessageIndent { self.helpMessageIndent = helpMessageIndent }
     if let helpMessageLabelColumnWidth = helpMessageLabelColumnWidth { self.helpMessageLabelColumnWidth = helpMessageLabelColumnWidth }
     self.alwaysCompactUsageOptions = alwaysCompactUsageOptions
+    self.examples = examples
   }
 
   /// Creates the configuration for a command with a "super-command".
@@ -133,7 +145,8 @@ public struct CommandConfiguration {
     helpNames: NameSpecification? = nil,
     helpMessageIndent: Int? = nil,
     helpMessageLabelColumnWidth: Int? = nil,
-    alwaysCompactUsageOptions: Bool = false
+    alwaysCompactUsageOptions: Bool = false,
+    examples: [Example] = []
   ) {
     self.commandName = commandName
     self._superCommandName = _superCommandName
@@ -148,6 +161,7 @@ public struct CommandConfiguration {
     if let helpMessageIndent = helpMessageIndent { self.helpMessageIndent = helpMessageIndent }
     if let helpMessageLabelColumnWidth = helpMessageLabelColumnWidth { self.helpMessageLabelColumnWidth = helpMessageLabelColumnWidth }
     self.alwaysCompactUsageOptions = alwaysCompactUsageOptions
+    self.examples = examples
   }
 }
 
@@ -164,7 +178,8 @@ extension CommandConfiguration {
     helpNames: NameSpecification?,
     helpMessageIndent: Int?,
     helpMessageLabelColumnWidth: Int?,
-    alwaysCompactUsageOptions: Bool = false
+    alwaysCompactUsageOptions: Bool = false,
+    examples: [Example]
   ) {
     self.init(
       commandName: commandName,
@@ -178,6 +193,7 @@ extension CommandConfiguration {
       helpNames: helpNames,
       helpMessageIndent: helpMessageIndent,
       helpMessageLabelColumnWidth: helpMessageLabelColumnWidth,
-      alwaysCompactUsageOptions: alwaysCompactUsageOptions)
+      alwaysCompactUsageOptions: alwaysCompactUsageOptions,
+      examples: examples)
   }
 }
