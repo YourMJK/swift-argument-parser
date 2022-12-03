@@ -135,15 +135,15 @@ extension HelpGenerationTests {
 
   enum OptionFlags: String, EnumerableFlag { case optional, required }
   enum Degree {
-    case bachelor, master, doctor
+    case bachelor, graduate, doctorate
     static func degreeTransform(_ string: String) throws -> Degree {
       switch string {
       case "bachelor":
         return .bachelor
-      case "master":
-        return .master
-      case "doctor":
-        return .doctor
+      case "graduate":
+        return .graduate
+      case "doctorate":
+        return .doctorate
       default:
         throw ValidationError("Not a valid string for 'Degree'")
       }
@@ -363,8 +363,8 @@ extension HelpGenerationTests {
   func testOverviewButNoAbstractSpacing() {
     let renderedHelp = HelpGenerator(J.self, visibility: .default)
       .rendered()
-    AssertEqualStringsIgnoringTrailingWhitespace(renderedHelp, """
-    OVERVIEW:
+    AssertEqualStrings(actual: renderedHelp, expected: """
+    OVERVIEW: \n\
     test
 
     USAGE: j
