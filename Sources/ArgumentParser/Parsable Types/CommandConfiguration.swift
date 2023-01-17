@@ -59,7 +59,7 @@ public struct CommandConfiguration {
   public var helpMessageIndent: Int = 2
   
   /// The width (in characters) of the left argument label column in the help message
-  public var helpMessageLabelColumnWidth: Int = 40
+  public var helpMessageLabelColumnWidth: Int = 26
   
   /// A Boolean value indicating whether the options in the usage string
   /// should always be shown in a compact form
