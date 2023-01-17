@@ -261,7 +261,7 @@ internal struct HelpGenerator {
   
   func usageMessage() -> String {
     guard !usage.isEmpty else { return "" }
-    return "Usage: \(usage.hangingIndentingEachLine(by: 7))"
+    return "Usage:  \(usage.hangingIndentingEachLine(by: 8))"
   }
   
   var includesSubcommands: Bool {
@@ -278,11 +278,11 @@ internal struct HelpGenerator {
       .joined(separator: "\n")
     let renderedAbstract = abstract.isEmpty
       ? ""
-      : "OVERVIEW: \(abstract)".wrapped(to: screenWidth) + "\n\n"
+      : "OVERVIEW:  \(abstract)".wrapped(to: screenWidth) + "\n\n"
     
     let renderedUsage = usage.isEmpty
       ? ""
-      : "USAGE: \(usage.hangingIndentingEachLine(by: 7))\n\n"
+      : "USAGE:  \(usage.hangingIndentingEachLine(by: 8))\n\n"
     
     return """
     \(renderedAbstract)\
