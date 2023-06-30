@@ -23,7 +23,7 @@ func _testSynopsis<T: ParsableArguments>(
   file: StaticString = #file,
   line: UInt = #line
 ) {
-  let help = UsageGenerator(toolName: "example", parsable: T(), visibility: visibility, parent: .root, compactUsageOptions: compactUsageOptions)
+  let help = UsageGenerator(toolName: "example", parsable: T(), visibility: visibility, parent: nil, compactUsageOptions: compactUsageOptions)
   XCTAssertEqual(help.synopsis, expected, file: file, line: line)
 }
 

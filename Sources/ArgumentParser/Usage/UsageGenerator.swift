@@ -23,7 +23,7 @@ extension UsageGenerator {
     self.init(toolName: toolName, definition: definition, compactUsageOptions: compactUsageOptions)
   }
   
-  init(toolName: String, parsable: ParsableArguments, visibility: ArgumentVisibility, parent: InputKey.Parent, compactUsageOptions: Bool) {
+  init(toolName: String, parsable: ParsableArguments, visibility: ArgumentVisibility, parent: InputKey?, compactUsageOptions: Bool) {
     self.init(
       toolName: toolName,
       definition: ArgumentSet(type(of: parsable), visibility: visibility, parent: parent),
