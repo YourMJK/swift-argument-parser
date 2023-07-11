@@ -41,31 +41,32 @@ extension UsageGenerator {
   /// In `roff`.
   var synopsis: String {
     var options = Array(definition)
-    if options.count == 0 {
-      return toolName
-    }
-    else if options.count > 12 || compactUsageOptions {
+    var components = [toolName]
+    if options.count > 12 || compactUsageOptions {
       // When we have too many options, keep required and positional arguments,
       // but discard the rest.
+      var optionalOptionsCount = options.count
       options = options.filter {
         $0.isPositional || !$0.help.options.contains(.isOptional)
       }
+      optionalOptionsCount -= options.count
       // If there are between 1 and 12 options left, print them, otherwise print
       // a simplified usage string.
-      if !options.isEmpty, options.count <= 12 {
-        let synopsis = options
-          .map { $0.synopsis }
-          .joined(separator: " ")
-        return "\(toolName) [OPTIONS ...] \(synopsis)"
+      if options.count > 12 {
+        components.append("<OPTIONS/ARGUMENTS ...>")
+        options.removeAll()
       }
-      return "\(toolName) OPTIONS ..."
+      else if optionalOptionsCount != 0 {
+        components.append("[OPTIONS ...]")
+      }
     }
-    else {
+    if !options.isEmpty {
       let synopsis = options
         .map { $0.synopsis }
         .joined(separator: " ")
-      return "\(toolName) \(synopsis)"
+      components.append(synopsis)
     }
+    return components.joined(separator: " ")
   }
 }
 
