@@ -168,7 +168,7 @@ public struct CommandConfiguration {
 extension CommandConfiguration {
   @available(*, deprecated, message: "Use the memberwise initializer with the usage parameter.")
   public init(
-    commandName: String?,
+    commandName _commandName: String?,
     abstract: String,
     discussion: String,
     version: String,
@@ -182,7 +182,7 @@ extension CommandConfiguration {
     examples: [Example]
   ) {
     self.init(
-      commandName: commandName,
+      commandName: _commandName,
       abstract: abstract,
       usage: "",
       discussion: discussion,

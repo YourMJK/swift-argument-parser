@@ -16,7 +16,7 @@ import ArgumentParserTestHelpers
 final class HelpGenerationTests: XCTestCase {
 }
 
-extension URL: ExpressibleByArgument {
+extension Foundation.URL: ArgumentParser.ExpressibleByArgument {
   public init?(argument: String) {
     guard let url = URL(string: argument) else {
       return nil
@@ -807,10 +807,7 @@ extension HelpGenerationTests {
   }
   
   func testColumnsEnvironmentOverride() throws {
-    #if os(Windows) || os(WASI)
-    throw XCTSkip("Unsupported on this platform")
-    #endif
-
+#if !(os(Windows) || os(WASI))
     defer { unsetenv("COLUMNS") }
     unsetenv("COLUMNS")
     AssertHelp(.default, for: WideHelp.self, columns: nil, equals: """
@@ -849,5 +846,6 @@ extension HelpGenerationTests {
         -h, --help              Show help information.
       
       """)
+#endif
   }
 }
